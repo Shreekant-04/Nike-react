@@ -1,16 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  NavLink,
-  useLocation,
-} from "react-router-dom";
-import { useShoe, PostProvider } from "./context";
-import "./style.css";
-import PaymentPage from "./PaymentPage";
+import { useState } from "react";
 
 const nikeShoes = [
   {
@@ -99,69 +88,91 @@ const nikeShoes = [
   },
 ];
 
-export default function App() {
+function App() {
+  const [cartItems, setCartItems] = useState([]);
+
+  function addToCart(shoe) {
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.name === shoe.name);
+      if (existingItem) {
+        return prevItems.map((item) =>
+          item.name === shoe.name
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [...prevItems, { ...shoe, quantity: 1 }];
+      }
+    });
+  }
+
+  function updateCart(name, quantity) {
+    setCartItems((prevItems) => {
+      return prevItems
+        .map((item) =>
+          item.name === name
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        )
+        .filter((item) => item.quantity > 0);
+    });
+  }
+
+  const total = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
   return (
-    <PostProvider>
-      <Router>
+    <>
+      <header className="header">
         <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/payment" element={<PaymentPage />} />
-        </Routes>
-        <ConditionalNavLink />
-      </Router>
-    </PostProvider>
+      </header>
+      <div className="app">
+        {nikeShoes.map((shoe) => (
+          <Shoes shoe={shoe} key={shoe.name} addToCart={addToCart} />
+        ))}
+      </div>
+      <div className="Cart-wrapper">
+        {cartItems.map((item) => (
+          <CartItems item={item} key={item.name} updateCart={updateCart} />
+        ))}
+      </div>
+      <TotalAmt total={total} />
+    </>
   );
 }
 
-function Home() {
-  return (
-    <div className="app">
-      {nikeShoes.map((shoe) => (
-        <Shoes shoe={shoe} key={shoe.name} />
-      ))}
-      <CartItems />
-      <TotalAmt />
-    </div>
-  );
-}
+export default App;
 
 function Header() {
   return (
-    <header className="header">
-      <ul className="nav">
-        <li>
-          <Link to="/">
-            <a href="#root" className="logo">
-              <svg
-                viewBox="0 0 24 24"
-                role="img"
-                width="44px"
-                height="44px"
-                fill="none"
-              >
-                <path
-                  fill="currentColor"
-                  fillRule="evenodd"
-                  d="M21 8.719L7.836 14.303C6.74 14.768 5.818 15 5.075 15c-.836 0-1.445-.295-1.819-.884-.485-.76-.273-1.982.559-3.272.494-.754 1.122-1.446 1.734-2.108-.144.234-1.415 2.349-.025 3.345.275.2.666.298 1.147.298.386 0 .829-.063 1.316-.19L21 8.719z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-            </a>
-          </Link>
-        </li>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>Categories</li>
-        <li>About Us</li>
-      </ul>
-    </header>
+    <ul className="nav">
+      <li>
+        <a href="#root" className="logo">
+          <svg
+            viewBox="0 0 24 24"
+            role="img"
+            width="44px"
+            height="44px"
+            fill="none">
+            <path
+              fill="currentColor"
+              fillRule="evenodd"
+              d="M21 8.719L7.836 14.303C6.74 14.768 5.818 15 5.075 15c-.836 0-1.445-.295-1.819-.884-.485-.76-.273-1.982.559-3.272.494-.754 1.122-1.446 1.734-2.108-.144.234-1.415 2.349-.025 3.345.275.2.666.298 1.147.298.386 0 .829-.063 1.316-.19L21 8.719z"
+              clipRule="evenodd"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="#root">Home</a>
+      </li>
+      <li>Categories</li>
+      <li>About Us</li>
+    </ul>
   );
 }
-
-function Shoes({ shoe }) {
-  const { addToCart } = useShoe();
+function Shoes({ shoe, addToCart }) {
   return (
     <div className="shoes">
       <h2>{shoe.name}</h2>
@@ -176,19 +187,7 @@ function Shoes({ shoe }) {
   );
 }
 
-function CartItems() {
-  const { cartItems } = useShoe();
-  return (
-    <div className="Cart-wrapper">
-      {cartItems.map((item) => (
-        <Items item={item} key={item.name} />
-      ))}
-    </div>
-  );
-}
-
-function Items({ item }) {
-  const { updateCart } = useShoe();
+function CartItems({ item, updateCart }) {
   return (
     <div className="cart-item">
       <img src={item.image} alt={item.name} />
@@ -206,8 +205,7 @@ function Items({ item }) {
   );
 }
 
-function TotalAmt() {
-  const { total } = useShoe();
+function TotalAmt({ total }) {
   return (
     <div className="total-amt">
       <h1>Total : </h1>
@@ -215,25 +213,3 @@ function TotalAmt() {
     </div>
   );
 }
-
-// function Payment() {
-//   return (
-//     <div className="payment">
-//       <PaymentPage />
-//       <CartItems />
-//       <TotalAmt />
-//     </div>
-//   );
-// }
-
-function ConditionalNavLink() {
-  const location = useLocation();
-  const isPaymentPage = location.pathname === "/payment";
-
-  return (
-    <NavLink to={isPaymentPage ? "/" : "/payment"} className="payment-button">
-      {isPaymentPage ? "Back to shopping" : "Proceed to Payment"}
-    </NavLink>
-  );
-}
-export { CartItems, TotalAmt,ConditionalNavLink };

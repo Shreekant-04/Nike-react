@@ -1,3 +1,6 @@
+import React from "react";
+import { useState } from "react";
+
 const nikeShoes = [
   {
     name: "Nike Air Max 270",
@@ -84,3 +87,93 @@ const nikeShoes = [
       "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/10dfb6ca-9206-4ea8-93b5-7a4fc9094cb0/invincible-3-road-running-shoes-KZFTMC.png",
   },
 ];
+
+function App() {
+  const [cartItems, setCartItems] = useState([]);
+  const [total, setTotal] = useState([]);
+
+  function addToCart(shoe) {
+    setCartItems([...cartItems, shoe]);
+    console.log(cartItems);
+  }
+  function addToTotal(price) {
+    setTotal([...total, price]);
+  }
+  console.log(total);
+
+  return (
+    <>
+      <div className="app">
+        {nikeShoes.map((shoe) => (
+          <Shoes shoe={shoe} key={shoe.name} addToCart={addToCart} />
+        ))}
+      </div>
+      <div className="Cart-wrapper">
+        {cartItems.map((item) => (
+          <CartItems items={item} key={Date.now() * Math.random()} />
+        ))}
+      </div>
+      <TotalAmt items={total} />
+    </>
+  );
+}
+
+export default App;
+
+function Shoes({ shoe, addToCart }) {
+  return (
+    <div className="shoes">
+      <h2>{shoe.name}</h2>
+      <img src={shoe.image} alt={shoe.image} />
+      <p className="price">
+        <span>₹</span> {shoe.price}.00/-
+      </p>
+      <button className="add-btn" onClick={() => addToCart(shoe)}>
+        Add To Cart
+      </button>
+    </div>
+  );
+}
+
+function CartItems({ items }) {
+  const [add, setAdd] = useState(1);
+  let price = items.price * add;
+
+  function handleSub() {
+    if (add > 1) {
+      setAdd(add - 1);
+    }
+  }
+
+  function handleAdd() {
+    if (add >= 1) {
+      setAdd(add + 1);
+    }
+  }
+
+  return (
+    <div className="cart-item">
+      <img src={items.image} alt="image1" />
+      <p className="shoe-name">{items.name}</p>
+      <div className="add-sub-btn">
+        <button onClick={handleSub}>-</button>
+        <p>{add}</p>
+        <button onClick={(handleAdd, () => addToTotal(price))}>+</button>
+      </div>
+      <p className="price">
+        <span>₹</span>
+        {price}.00
+      </p>
+    </div>
+  );
+}
+
+function TotalAmt({ items }) {
+  const total = items.reduce((sum, item) => sum + item.price, 0);
+  return (
+    <div className="total-amt">
+      <h1>Total : </h1>
+      <h2>₹{total}.00</h2>
+    </div>
+  );
+}

@@ -28,16 +28,16 @@ body {
   gap: 30px;
   cursor: pointer;
   font-size: calc(5px + 1.5vw);
+
 }
-.nav li > a {
+.nav li > a{
   text-decoration: none;
   color: black;
+
 }
-.logo {
+.logo{
   margin-right: auto;
   display: flex;
-  text-decoration: none;
-  color: #000;
 }
 
 .app {
@@ -82,14 +82,17 @@ body {
   height: 50vmin;
   width: 70vmin;
   position: fixed;
-  top: 0;
+  top: 10%;
   right: 20px;
   margin-top: 10%;
   padding: 10px;
   box-shadow: 0 0 10px;
   overflow-y: scroll;
   overflow-x: hidden;
+  
 }
+
+
 
 .cart-item {
   height: 8vmin;
@@ -118,36 +121,11 @@ body {
   align-items: center;
   gap: 10%;
   position: fixed;
-  bottom: 20%;
+  bottom: 10%;
   right: 2%;
 }
 .add-sub-btn button {
   width: 20%;
   cursor: pointer;
   height: 3vmin;
-}
-
-.payment-button {
-  position: fixed;
-  right: 5%;
-  bottom: 10%;
-  width: 50vmin;
-  height: 8vmin;
-  border: none;
-  background-color: #000;
-  color: #fff;
-  border-radius: 20px;
-  font-size: calc(10px + 1vw);
-  cursor: pointer;
-  text-align: center;
-  line-height: 8vmin;
-  text-decoration: none;
-}
-.payment-button:active,
-.submitBtn:active {
-  transform: scale(1.05);
-}
-
-.payment {
-  height: 100vh;
 }
